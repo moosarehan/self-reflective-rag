@@ -46,25 +46,6 @@ Relevance compares **question and passage**. Grounding compares **draft and pass
 
 The notebooks translate the four questions into explicit LangGraph nodes. Each grading node asks an LLM for a structured decision. Conditional edges use those decisions to choose the next step. This is a teaching implementation of the research ideas using a prompted model. The two loops below correspond to two different actions a reader can inspect in the code. [Complete workflow notebook](./self_rag_step7.ipynb)
 
-```mermaid
-flowchart TD
-    S([START]) --> D[decide_retrieval]
-    D -->|Direct answer| G[generate_direct]
-    G --> E([END])
-    D -->|Evidence needed| R[retrieve]
-    R --> V[is_relevant]
-    V -->|No relevant passages| N[no_answer_found]
-    V -->|Keep relevant passages| C[generate_from_context]
-    C --> P[is_sup]
-    P -->|Revise unsupported claims| A[revise_answer]
-    A --> P
-    P -->|Supported or revision limit reached| U[is_use]
-    U -->|Useful| E
-    U -->|Try a better search| W[rewrite_question]
-    W --> R
-    U -->|Rewrite limit reached| N
-    N --> E
-```
 
 1. **Decide whether to retrieve.** The graph starts at `decide_retrieval`. A general question such as “What is a refund?” can go to `generate_direct` and finish. A question about this company's annual plan goes to `retrieve`. The direct branch ends after generation. The remaining three checks belong to the evidence-based branch in this notebook.
 2. **Check each passage for relevance.** The retriever returns candidate documents. The `is_relevant` node reads each one alongside the question and keeps the passages on topic. If none qualify, `no_answer_found` ends the run. Otherwise, `generate_from_context` drafts an answer using the retained evidence.
