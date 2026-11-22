@@ -2,6 +2,8 @@
 
 ## Three problems with traditional RAG
 
+![Three limitations of traditional RAG](assets/traditional-rag.png)
+
 A basic retrieval-augmented generation (RAG) pipeline searches a collection of documents, adds the top passages to the user's question, and asks a language model to answer. That simple sequence leaves three decisions unchecked.
 
 1. **It retrieves even when the user has supplied everything needed.** “Rewrite this sentence politely” can be answered from the sentence itself. Searching a company handbook adds latency and may introduce details the user never asked for.
@@ -11,6 +13,8 @@ A basic retrieval-augmented generation (RAG) pipeline searches a collection of d
 **Self-RAG addresses these three problems.**
 
 ## What is Self-RAG?
+
+![Self-RAG definition and four reflection questions](assets/four-questions.png)
 
 Self-reflective retrieval-augmented generation lets a language model judge when it needs outside information and evaluate how well it uses that information. In the original research, a model learns to emit special **reflection tokens** while generating text. They express decisions such as whether to retrieve, how relevant a passage is, and how well it supports a candidate continuation. Those signals help the system choose among possible continuations as it builds an answer. [Self-RAG paper](https://arxiv.org/abs/2310.11511)
 
@@ -37,6 +41,8 @@ Relevance compares **question and passage**. Grounding compares **draft and pass
 | **How it evaluates the answer** | Its built-in evaluator focuses on the evidence supplied to the generator. | The model checks whether the passage **supports its claims** and whether the overall answer **addresses the user's request**. |
 
 ## Self-RAG architecture in this repository
+
+![Self-RAG graph with answer revision and retrieval retry loops](assets/self-rag-architecture.png)
 
 The notebooks translate the four questions into explicit LangGraph nodes. Each grading node asks an LLM for a structured decision. Conditional edges use those decisions to choose the next step. This is a teaching implementation of the research ideas using a prompted model. The two loops below correspond to two different actions a reader can inspect in the code. [Complete workflow notebook](./self_rag_step7.ipynb)
 
